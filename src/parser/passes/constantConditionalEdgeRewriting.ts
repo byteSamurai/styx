@@ -16,11 +16,7 @@ export function rewriteConstantConditionalEdges(graph: ControlFlowGraph) {
   }
 }
 
-function visitNode(
-  node: FlowNode,
-  visitedNodes: NumericSet,
-  edgesToRemove: FlowEdge[]
-) {
+function visitNode(node: FlowNode, visitedNodes: NumericSet, edgesToRemove: FlowEdge[]) {
   if (visitedNodes.contains(node.id)) {
     return;
   }
@@ -34,11 +30,7 @@ function visitNode(
 }
 
 function inspectEdge(edge: FlowEdge, edgesToRemove: FlowEdge[]) {
-  if (
-    edge.type !== EdgeType.Conditional ||
-    edge.data == null ||
-    !isCompileTimeConstant(edge.data)
-  ) {
+  if (edge.type !== EdgeType.Conditional || edge.data == null || !isCompileTimeConstant(edge.data)) {
     // We only deal with conditional edges that have a condition
     // whose truthiness we can safely determine at compile-time
     return;
@@ -62,10 +54,7 @@ function isCompileTimeConstant(expression: ESTree.Expression): boolean {
 
     case ESTree.NodeType.UnaryExpression:
       let unaryExpression = <ESTree.UnaryExpression>expression;
-      return (
-        unaryExpression.operator === "!" &&
-        isCompileTimeConstant(unaryExpression.argument)
-      );
+      return unaryExpression.operator === "!" && isCompileTimeConstant(unaryExpression.argument);
 
     default:
       return false;

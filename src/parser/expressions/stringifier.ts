@@ -22,7 +22,7 @@ function stringify(expression: ESTree.Expression): string {
     [ESTree.NodeType.SequenceExpression]: stringifySequenceExpression,
     [ESTree.NodeType.ThisExpression]: stringifyThisExpression,
     [ESTree.NodeType.UnaryExpression]: stringifyUnaryExpression,
-    [ESTree.NodeType.UpdateExpression]: stringifyUpdateExpression
+    [ESTree.NodeType.UpdateExpression]: stringifyUpdateExpression,
   };
 
   let stringifier = stringifiers[expression.type];
@@ -30,9 +30,7 @@ function stringify(expression: ESTree.Expression): string {
   return stringifier ? stringifier(expression) : "<UNEXPECTED>";
 }
 
-function stringifyArrayExpression(
-  arrayExpression: ESTree.ArrayExpression
-): string {
+function stringifyArrayExpression(arrayExpression: ESTree.ArrayExpression): string {
   let stringifiedElements = "";
   let isFirstElement = true;
   let previousElementWasNull = false;
@@ -56,18 +54,14 @@ function stringifyArrayExpression(
   return `[${stringifiedElements}]`;
 }
 
-function stringifyAssignmentExpression(
-  assignmentExpression: ESTree.AssignmentExpression
-): string {
+function stringifyAssignmentExpression(assignmentExpression: ESTree.AssignmentExpression): string {
   let left = stringify(assignmentExpression.left);
   let right = stringify(assignmentExpression.right);
 
   return `${left} ${assignmentExpression.operator} ${right}`;
 }
 
-function stringifyBinaryExpression(
-  binaryExpression: ESTree.BinaryExpression
-): string {
+function stringifyBinaryExpression(binaryExpression: ESTree.BinaryExpression): string {
   let left = stringify(binaryExpression.left);
   let right = stringify(binaryExpression.right);
 
@@ -82,18 +76,14 @@ function stringifyBinaryExpression(
   return `${left} ${binaryExpression.operator} ${right}`;
 }
 
-function stringifyCallExpression(
-  callExpression: ESTree.CallExpression
-): string {
+function stringifyCallExpression(callExpression: ESTree.CallExpression): string {
   let callee = stringify(callExpression.callee);
-  let args = callExpression.arguments.map(arg => stringify(arg)).join(", ");
+  let args = callExpression.arguments.map((arg) => stringify(arg)).join(", ");
 
   return `${callee}(${args})`;
 }
 
-function stringifyConditionalExpression(
-  conditionalExpression: ESTree.ConditionalExpression
-): string {
+function stringifyConditionalExpression(conditionalExpression: ESTree.ConditionalExpression): string {
   let test = stringify(conditionalExpression.test);
   let consequent = stringify(conditionalExpression.consequent);
   let alternate = stringify(conditionalExpression.alternate);
@@ -117,9 +107,7 @@ function stringifyLiteral(literal: ESTree.Literal): string {
   return literal.raw;
 }
 
-function stringifyLogicalExpression(
-  logicalExpression: ESTree.LogicalExpression
-): string {
+function stringifyLogicalExpression(logicalExpression: ESTree.LogicalExpression): string {
   let left = stringify(logicalExpression.left);
   let right = stringify(logicalExpression.right);
 
@@ -134,19 +122,13 @@ function stringifyLogicalExpression(
   return `${left} ${logicalExpression.operator} ${right}`;
 }
 
-function stringifyMemberExpression(
-  memberExpression: ESTree.MemberExpression
-): string {
+function stringifyMemberExpression(memberExpression: ESTree.MemberExpression): string {
   const object = stringify(memberExpression.object);
   const property = stringify(memberExpression.property);
 
-  const left = needsParenthesizing(memberExpression.object)
-    ? parenthesize(object)
-    : object;
+  const left = needsParenthesizing(memberExpression.object) ? parenthesize(object) : object;
 
-  return memberExpression.computed
-    ? `${left}[${property}]`
-    : `${left}.${property}`;
+  return memberExpression.computed ? `${left}[${property}]` : `${left}.${property}`;
 }
 
 function stringifyNewExpression(newExpression: ESTree.NewExpression): string {
@@ -155,15 +137,17 @@ function stringifyNewExpression(newExpression: ESTree.NewExpression): string {
   return `new ${call}`;
 }
 
-function stringifyObjectExpression(
-  objectExpression: ESTree.ObjectExpression
-): string {
+function stringifyObjectExpression(objectExpression: ESTree.ObjectExpression): string {
   if (objectExpression.properties.length === 0) {
     return "{}";
   }
 
   const properties = objectExpression.properties
-    .map(property => {
+    .map((property) => {
+      //e.g. Spread elements are not tuple
+      if (!property.key && !property.value) {
+        return stringify(property);
+      }
       let key = stringify(property.key);
       let value = stringify(property.value);
 
@@ -174,23 +158,17 @@ function stringifyObjectExpression(
   return `{\n    ${properties}\n}`;
 }
 
-function stringifySequenceExpression(
-  sequenceExpression: ESTree.SequenceExpression
-): string {
+function stringifySequenceExpression(sequenceExpression: ESTree.SequenceExpression): string {
   let expressions = sequenceExpression.expressions.map(stringify).join(", ");
 
   return parenthesize(expressions);
 }
 
-function stringifyThisExpression(
-  thisExpression: ESTree.ThisExpression
-): string {
+function stringifyThisExpression(thisExpression: ESTree.ThisExpression): string {
   return "this";
 }
 
-function stringifyUnaryExpression(
-  unaryExpression: ESTree.UnaryExpression
-): string {
+function stringifyUnaryExpression(unaryExpression: ESTree.UnaryExpression): string {
   let operator = unaryExpression.operator;
   let argument = stringify(unaryExpression.argument);
   let joiner = operator.length > 1 ? " " : "";
@@ -199,17 +177,11 @@ function stringifyUnaryExpression(
     argument = parenthesize(argument);
   }
 
-  return unaryExpression.prefix
-    ? operator + joiner + argument
-    : argument + joiner + operator;
+  return unaryExpression.prefix ? operator + joiner + argument : argument + joiner + operator;
 }
 
-function stringifyUpdateExpression(
-  updateExpression: ESTree.UpdateExpression
-): string {
-  return updateExpression.prefix
-    ? updateExpression.operator + stringify(updateExpression.argument)
-    : stringify(updateExpression.argument) + updateExpression.operator;
+function stringifyUpdateExpression(updateExpression: ESTree.UpdateExpression): string {
+  return updateExpression.prefix ? updateExpression.operator + stringify(updateExpression.argument) : stringify(updateExpression.argument) + updateExpression.operator;
 }
 
 function needsParenthesizing(expression: ESTree.Expression): boolean {

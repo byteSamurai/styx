@@ -2,13 +2,13 @@
 /* global Styx */
 /* global esprima */
 /* global vis */
-(function() {
+(function () {
   var network;
   var fontFaces = "Consolas, Menlo, Monaco, monospace";
 
   window.cfgVisualization = {
     parseProgram: parseProgram,
-    renderControlFlowGraph: renderControlFlowGraph
+    renderControlFlowGraph: renderControlFlowGraph,
   };
 
   function parseProgram(code, options) {
@@ -24,27 +24,27 @@
         hierarchical: {
           levelSeparation: 100,
           direction: "UD",
-          sortMethod: "directed"
-        }
+          sortMethod: "directed",
+        },
       },
 
       nodes: {
-        shape: "circle"
+        shape: "circle",
       },
 
       edges: {
         smooth: {
           type: "curvedCW",
-          roundness: 0.45
-        }
-      }
+          roundness: 0.45,
+        },
+      },
     };
 
     if (network) {
       network.destroy();
     }
 
-    setTimeout(function() {
+    setTimeout(function () {
       var visGraph = generateNodesAndEdges(controlFlowGraph);
       network = new vis.Network(container, visGraph, visualizationOptions);
     }, 0);
@@ -54,13 +54,13 @@
     var nodes = [];
     var edges = [];
 
-    _.each(cfg.nodes, function(node) {
+    _.each(cfg.nodes, function (node) {
       addNodeAndEdges(node, nodes, edges);
     });
 
     return {
       nodes: new vis.DataSet(nodes),
-      edges: new vis.DataSet(edges)
+      edges: new vis.DataSet(edges),
     };
   }
 
@@ -71,11 +71,11 @@
       color: getNodeColor(node),
       font: {
         face: fontFaces,
-        color: getNodeFontColor(node)
-      }
+        color: getNodeFontColor(node),
+      },
     });
 
-    _.each(node.outgoingEdges, function(outgoingEdge) {
+    _.each(node.outgoingEdges, function (outgoingEdge) {
       var color = getEdgeColor(outgoingEdge);
       var visEdge = {
         from: node.id,
@@ -85,9 +85,9 @@
         font: {
           background: "white",
           color: color,
-          face: fontFaces
+          face: fontFaces,
         },
-        arrows: "to"
+        arrows: "to",
       };
 
       edges.push(visEdge);

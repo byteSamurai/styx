@@ -7,21 +7,11 @@ import { parseWhileStatement } from "./while";
 import { parseStatement } from "./statement";
 
 import * as ESTree from "../../estree";
-import {
-  Completion,
-  EnclosingStatement,
-  EnclosingStatementType,
-  FlowNode,
-  ParsingContext
-} from "../../flow";
+import { Completion, EnclosingStatement, EnclosingStatementType, FlowNode, ParsingContext } from "../../flow";
 
 export { parseLabeledStatement };
 
-function parseLabeledStatement(
-  labeledStatement: ESTree.LabeledStatement,
-  currentNode: FlowNode,
-  context: ParsingContext
-): Completion {
+function parseLabeledStatement(labeledStatement: ESTree.LabeledStatement, currentNode: FlowNode, context: ParsingContext): Completion {
   let body = labeledStatement.body;
   let label = labeledStatement.label.name;
 
@@ -30,52 +20,22 @@ function parseLabeledStatement(
     case ESTree.NodeType.IfStatement:
     case ESTree.NodeType.TryStatement:
     case ESTree.NodeType.WithStatement:
-      return parseLabeledEnclosingStatement(
-        labeledStatement,
-        currentNode,
-        context,
-        label
-      );
+      return parseLabeledEnclosingStatement(labeledStatement, currentNode, context, label);
 
     case ESTree.NodeType.SwitchStatement:
-      return parseSwitchStatement(
-        <ESTree.SwitchStatement>body,
-        currentNode,
-        context,
-        label
-      );
+      return parseSwitchStatement(<ESTree.SwitchStatement>body, currentNode, context, label);
 
     case ESTree.NodeType.WhileStatement:
-      return parseWhileStatement(
-        <ESTree.WhileStatement>body,
-        currentNode,
-        context,
-        label
-      );
+      return parseWhileStatement(<ESTree.WhileStatement>body, currentNode, context, label);
 
     case ESTree.NodeType.DoWhileStatement:
-      return parseDoWhileStatement(
-        <ESTree.DoWhileStatement>body,
-        currentNode,
-        context,
-        label
-      );
+      return parseDoWhileStatement(<ESTree.DoWhileStatement>body, currentNode, context, label);
 
     case ESTree.NodeType.ForStatement:
-      return parseForStatement(
-        <ESTree.ForStatement>body,
-        currentNode,
-        context,
-        label
-      );
+      return parseForStatement(<ESTree.ForStatement>body, currentNode, context, label);
 
     case ESTree.NodeType.ForInStatement:
-      return parseForInStatement(
-        <ESTree.ForInStatement>body,
-        currentNode,
-        context,
-        label
-      );
+      return parseForInStatement(<ESTree.ForInStatement>body, currentNode, context, label);
 
     default:
       // If we didn't encounter an enclosing statement,
@@ -84,27 +44,18 @@ function parseLabeledStatement(
   }
 }
 
-function parseLabeledEnclosingStatement(
-  labeledStatement: ESTree.LabeledStatement,
-  currentNode: FlowNode,
-  context: ParsingContext,
-  label: string
-): Completion {
+function parseLabeledEnclosingStatement(labeledStatement: ESTree.LabeledStatement, currentNode: FlowNode, context: ParsingContext, label: string): Completion {
   let finalNode = context.createNode();
 
   let enclosingStatement: EnclosingStatement = {
     type: EnclosingStatementType.OtherStatement,
     breakTarget: finalNode,
     continueTarget: null,
-    label: label
+    label: label,
   };
 
   context.enclosingStatements.push(enclosingStatement);
-  let bodyCompletion = parseStatement(
-    labeledStatement.body,
-    currentNode,
-    context
-  );
+  let bodyCompletion = parseStatement(labeledStatement.body, currentNode, context);
   context.enclosingStatements.pop();
 
   if (bodyCompletion.normal) {

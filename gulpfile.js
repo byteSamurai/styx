@@ -5,11 +5,7 @@ const gulpRename = require("gulp-rename");
 const browserifyEntryFile = "./lib/browser.js";
 
 function browserify() {
-  return gulp
-    .src(browserifyEntryFile)
-    .pipe(gulpBrowserify())
-    .pipe(gulpRename("styx.js"))
-    .pipe(gulp.dest("./dist/browser"));
+  return gulp.src(browserifyEntryFile).pipe(gulpBrowserify()).pipe(gulpRename("styx.js")).pipe(gulp.dest("./dist/browser"));
 }
 
 function browserifyWatch() {

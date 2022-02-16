@@ -9,6 +9,7 @@ import { parseEmptyStatement } from "./empty";
 import { parseExpression, parseExpressionStatement } from "./expression";
 import { parseForStatement } from "./for";
 import { parseForInStatement } from "./forIn";
+import { parseForOfStatement } from "./forOf";
 import { parseIfStatement } from "./if";
 import { parseLabeledStatement } from "./labeled";
 import { parseReturnStatement } from "./return";
@@ -24,18 +25,10 @@ import { Completion, FlowNode, ParsingContext } from "../../flow";
 export { parseStatement, parseStatements };
 
 interface StatementTypeToParserMap {
-  [type: string]: (
-    statement: ESTree.Statement,
-    currentNode: FlowNode,
-    context: ParsingContext
-  ) => Completion;
+  [type: string]: (statement: ESTree.Statement, currentNode: FlowNode, context: ParsingContext) => Completion;
 }
 
-function parseStatements(
-  statements: ESTree.Statement[],
-  currentNode: FlowNode,
-  context: ParsingContext
-): Completion {
+function parseStatements(statements: ESTree.Statement[], currentNode: FlowNode, context: ParsingContext): Completion {
   for (let statement of statements) {
     let completion = parseStatement(statement, currentNode, context);
 
@@ -51,11 +44,7 @@ function parseStatements(
   return { normal: currentNode };
 }
 
-function parseStatement(
-  statement: ESTree.Statement,
-  currentNode: FlowNode,
-  context: ParsingContext
-): Completion {
+function parseStatement(statement: ESTree.Statement, currentNode: FlowNode, context: ParsingContext): Completion {
   let statementParsers: StatementTypeToParserMap = {
     [ESTree.NodeType.BlockStatement]: parseBlockStatement,
     [ESTree.NodeType.BreakStatement]: parseBreakStatement,
@@ -64,6 +53,7 @@ function parseStatement(
     [ESTree.NodeType.DoWhileStatement]: parseDoWhileStatement,
     [ESTree.NodeType.EmptyStatement]: parseEmptyStatement,
     [ESTree.NodeType.ExpressionStatement]: parseExpressionStatement,
+    [ESTree.NodeType.ForOfStatement]: parseForOfStatement,
     [ESTree.NodeType.ForInStatement]: parseForInStatement,
     [ESTree.NodeType.ForStatement]: parseForStatement,
     [ESTree.NodeType.FunctionDeclaration]: parseFunctionDeclaration,
@@ -75,7 +65,7 @@ function parseStatement(
     [ESTree.NodeType.TryStatement]: parseTryStatement,
     [ESTree.NodeType.VariableDeclaration]: parseVariableDeclaration,
     [ESTree.NodeType.WhileStatement]: parseWhileStatement,
-    [ESTree.NodeType.WithStatement]: parseWithStatement
+    [ESTree.NodeType.WithStatement]: parseWithStatement,
   };
 
   let parsingMethod = statementParsers[statement.type];

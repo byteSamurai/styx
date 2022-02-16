@@ -1,13 +1,7 @@
 import { parseBlockStatement } from "./block";
 
 import * as ESTree from "../../estree";
-import {
-  Completion,
-  EnclosingStatementType,
-  EnclosingTryStatement,
-  FlowNode,
-  ParsingContext
-} from "../../flow";
+import { Completion, EnclosingStatementType, EnclosingTryStatement, FlowNode, ParsingContext } from "../../flow";
 
 export { parseTryStatement };
 
@@ -16,25 +10,17 @@ interface ParsedFinalizer {
   bodyCompletion: Completion;
 }
 
-function parseTryStatement(
-  tryStatement: ESTree.TryStatement,
-  currentNode: FlowNode,
-  context: ParsingContext
-): Completion {
-  let handler = tryStatement.handlers[0];
+function parseTryStatement(tryStatement: ESTree.TryStatement, currentNode: FlowNode, context: ParsingContext): Completion {
+  let handler = tryStatement.handler;
   let finalizer = tryStatement.finalizer;
 
   let parseFinalizer: () => ParsedFinalizer = () => {
     let finalizerBodyEntry = context.createNode();
-    let finalizerBodyCompletion = parseBlockStatement(
-      finalizer,
-      finalizerBodyEntry,
-      context
-    );
+    let finalizerBodyCompletion = parseBlockStatement(finalizer, finalizerBodyEntry, context);
 
     return {
       bodyEntry: finalizerBodyEntry,
-      bodyCompletion: finalizerBodyCompletion
+      bodyCompletion: finalizerBodyCompletion,
     };
   };
 
@@ -50,22 +36,16 @@ function parseTryStatement(
     isCurrentlyInFinalizer: false,
     handler: handler,
     handlerBodyEntry,
-    parseFinalizer: finalizer ? parseFinalizer : null
+    parseFinalizer: finalizer ? parseFinalizer : null,
   };
 
   context.enclosingStatements.push(enclosingTryStatement);
 
   enclosingTryStatement.isCurrentlyInTryBlock = true;
-  let tryBlockCompletion = parseBlockStatement(
-    tryStatement.block,
-    currentNode,
-    context
-  );
+  let tryBlockCompletion = parseBlockStatement(tryStatement.block, currentNode, context);
   enclosingTryStatement.isCurrentlyInTryBlock = false;
 
-  let handlerBodyCompletion = handler
-    ? parseBlockStatement(handler.body, handlerBodyEntry, context)
-    : null;
+  let handlerBodyCompletion = handler ? parseBlockStatement(handler.body, handlerBodyEntry, context) : null;
 
   context.enclosingStatements.pop();
 
@@ -80,19 +60,10 @@ function parseTryStatement(
   }
 
   // try/catch/finally production
-  return parseTryCatchFinally(
-    tryBlockCompletion,
-    handlerBodyCompletion,
-    parseFinalizer,
-    context
-  );
+  return parseTryCatchFinally(tryBlockCompletion, handlerBodyCompletion, parseFinalizer, context);
 }
 
-function parseTryCatch(
-  tryBlockCompletion: Completion,
-  handlerBodyCompletion: Completion,
-  context: ParsingContext
-): Completion {
+function parseTryCatch(tryBlockCompletion: Completion, handlerBodyCompletion: Completion, context: ParsingContext): Completion {
   let finalNode = context.createNode();
 
   if (tryBlockCompletion.normal) {
@@ -106,11 +77,7 @@ function parseTryCatch(
   return { normal: finalNode };
 }
 
-function parseTryFinally(
-  tryBlockCompletion: Completion,
-  parseFinalizer: () => ParsedFinalizer,
-  context: ParsingContext
-): Completion {
+function parseTryFinally(tryBlockCompletion: Completion, parseFinalizer: () => ParsedFinalizer, context: ParsingContext): Completion {
   if (!tryBlockCompletion.normal) {
     return tryBlockCompletion;
   }
@@ -128,12 +95,7 @@ function parseTryFinally(
   return finalizer.bodyCompletion;
 }
 
-function parseTryCatchFinally(
-  tryBlockCompletion: Completion,
-  handlerBodyCompletion: Completion,
-  parseFinalizer: () => ParsedFinalizer,
-  context: ParsingContext
-): Completion {
+function parseTryCatchFinally(tryBlockCompletion: Completion, handlerBodyCompletion: Completion, parseFinalizer: () => ParsedFinalizer, context: ParsingContext): Completion {
   let finalNode = context.createNode();
 
   if (tryBlockCompletion.normal) {

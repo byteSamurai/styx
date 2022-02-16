@@ -12,7 +12,7 @@ interface LookupObject<T> {
 }
 
 export let NumericMap = {
-  create: createMap
+  create: createMap,
 };
 
 function createMap<T>(): NumericMap<T> {
@@ -24,16 +24,16 @@ function createMap<T>(): NumericMap<T> {
     },
 
     entries() {
-      return Object.keys(lookup).map(key => {
+      return Object.keys(lookup).map((key) => {
         return {
           key: Number(key),
-          value: lookup[key]
+          value: lookup[key],
         };
       });
     },
 
     values() {
-      return Object.keys(lookup).map(key => lookup[key]);
+      return Object.keys(lookup).map((key) => lookup[key]);
     },
 
     get(key) {
@@ -42,6 +42,6 @@ function createMap<T>(): NumericMap<T> {
 
     set(key, value) {
       lookup[key] = value;
-    }
+    },
   };
 }

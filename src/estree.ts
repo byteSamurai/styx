@@ -12,6 +12,7 @@ export class NodeType {
   static EmptyStatement = "EmptyStatement";
   static ExpressionStatement = "ExpressionStatement";
   static ForInStatement = "ForInStatement";
+  static ForOfStatement = "ForOfStatement";
   static ForStatement = "ForStatement";
   static FunctionDeclaration = "FunctionDeclaration";
   static FunctionExpression = "FunctionExpression";
@@ -41,13 +42,15 @@ export class NodeType {
 
 export interface Node {
   type: string;
+  loc?: {start:{line:Number, column: Number}, end:{line:Number, column: Number}},
+  range?: Number[]
 }
 
 // Programs
 
 export interface Program extends Node {
   body: Statement[];
-}
+}    
 
 // Functions
 
@@ -110,7 +113,7 @@ export interface ThrowStatement extends Statement {
 
 export interface TryStatement extends Statement {
   block: BlockStatement;
-  handlers: CatchClause[]; // Different from the ESTree specification, but implemented this way in Esprima
+  handler: CatchClause;
   finalizer: BlockStatement;
 }
 
@@ -132,6 +135,12 @@ export interface ForStatement extends Statement {
 }
 
 export interface ForInStatement extends Statement {
+  left: VariableDeclaration | Expression;
+  right: Expression;
+  body: Statement;
+}
+
+export interface ForOfStatement extends Statement {
   left: VariableDeclaration | Expression;
   right: Expression;
   body: Statement;

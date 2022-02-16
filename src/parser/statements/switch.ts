@@ -5,18 +5,9 @@ import { parseStatements } from "./statement";
 
 import * as ESTree from "../../estree";
 
-import {
-  createAssignmentExpression,
-  createIdentifier,
-  createIdentityComparisonExpression
-} from "../../estreeFactory";
+import { createAssignmentExpression, createIdentifier, createIdentityComparisonExpression } from "../../estreeFactory";
 
-import {
-  Completion,
-  EnclosingStatementType,
-  FlowNode,
-  ParsingContext
-} from "../../flow";
+import { Completion, EnclosingStatementType, FlowNode, ParsingContext } from "../../flow";
 
 export { parseSwitchStatement };
 
@@ -26,28 +17,15 @@ interface CaseBlock {
   caseClausesB: ESTree.SwitchCase[];
 }
 
-function parseSwitchStatement(
-  switchStatement: ESTree.SwitchStatement,
-  currentNode: FlowNode,
-  context: ParsingContext,
-  label?: string
-): Completion {
-  const switchExpressionIdentifier = context.createTemporaryLocalVariableName(
-    "switch"
-  );
+function parseSwitchStatement(switchStatement: ESTree.SwitchStatement, currentNode: FlowNode, context: ParsingContext, label?: string): Completion {
+  const switchExpressionIdentifier = context.createTemporaryLocalVariableName("switch");
 
   let switchExpressionAssignment = createAssignmentExpression({
     left: createIdentifier(switchExpressionIdentifier),
-    right: switchStatement.discriminant
+    right: switchStatement.discriminant,
   });
 
-  let evaluatedDiscriminantNode = context
-    .createNode()
-    .appendTo(
-      currentNode,
-      stringify(switchExpressionAssignment),
-      switchExpressionAssignment
-    );
+  let evaluatedDiscriminantNode = context.createNode().appendTo(currentNode, stringify(switchExpressionAssignment), switchExpressionAssignment);
 
   let finalNode = context.createNode();
 
@@ -55,12 +33,10 @@ function parseSwitchStatement(
     type: EnclosingStatementType.OtherStatement,
     breakTarget: finalNode,
     continueTarget: null,
-    label: label
+    label: label,
   });
 
-  let { caseClausesA, defaultCase, caseClausesB } = partitionCases(
-    switchStatement.cases
-  );
+  let { caseClausesA, defaultCase, caseClausesB } = partitionCases(switchStatement.cases);
 
   let stillSearchingNode = evaluatedDiscriminantNode;
   let endOfPreviousCaseBody: Completion = null;
@@ -70,15 +46,11 @@ function parseSwitchStatement(
     let matchingCaseCondition = createIdentityComparisonExpression({
       left: createIdentifier(switchExpressionIdentifier),
       right: caseClause.test
-    });
+    },
+    caseClause.range,
+    caseClause.loc);
 
-    let beginOfCaseBody = context
-      .createNode()
-      .appendConditionallyTo(
-        stillSearchingNode,
-        stringify(matchingCaseCondition),
-        matchingCaseCondition
-      );
+    let beginOfCaseBody = context.createNode().appendConditionallyTo(stillSearchingNode, stringify(matchingCaseCondition), matchingCaseCondition);
 
     if (caseClause === caseClausesB[0]) {
       firstNodeOfClauseListB = beginOfCaseBody;
@@ -91,20 +63,10 @@ function parseSwitchStatement(
       beginOfCaseBody.appendEpsilonEdgeTo(endOfPreviousCaseBody.normal);
     }
 
-    endOfPreviousCaseBody = parseStatements(
-      caseClause.consequent,
-      beginOfCaseBody,
-      context
-    );
+    endOfPreviousCaseBody = parseStatements(caseClause.consequent, beginOfCaseBody, context);
 
     let nonMatchingCaseCondition = negateTruthiness(matchingCaseCondition);
-    stillSearchingNode = context
-      .createNode()
-      .appendConditionallyTo(
-        stillSearchingNode,
-        stringify(nonMatchingCaseCondition),
-        nonMatchingCaseCondition
-      );
+    stillSearchingNode = context.createNode().appendConditionallyTo(stillSearchingNode, stringify(nonMatchingCaseCondition), nonMatchingCaseCondition);
   }
 
   if (endOfPreviousCaseBody && endOfPreviousCaseBody.normal) {
@@ -114,11 +76,7 @@ function parseSwitchStatement(
   }
 
   if (defaultCase) {
-    let defaultCaseCompletion = parseStatements(
-      defaultCase.consequent,
-      stillSearchingNode,
-      context
-    );
+    let defaultCaseCompletion = parseStatements(defaultCase.consequent, stillSearchingNode, context);
 
     if (defaultCaseCompletion.normal) {
       let nodeAfterDefaultCase = firstNodeOfClauseListB || finalNode;

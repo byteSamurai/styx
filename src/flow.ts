@@ -41,18 +41,13 @@ export class FlowNode {
     this.outgoingEdges = [];
   }
 
-  appendTo(
-    node: FlowNode,
-    label: string,
-    edgeData: ESTree.Expression | ESTree.Statement,
-    edgeType = EdgeType.Normal
-  ): FlowNode {
+  appendTo(node: FlowNode, label: string, edgeData: ESTree.Expression | ESTree.Statement, edgeType = EdgeType.Normal): FlowNode {
     let edge: FlowEdge = {
       source: node,
       target: this,
       type: edgeType,
       label: label,
-      data: edgeData
+      data: edgeData,
     };
 
     node.outgoingEdges.push(edge);
@@ -61,11 +56,7 @@ export class FlowNode {
     return this;
   }
 
-  appendConditionallyTo(
-    node: FlowNode,
-    label: string,
-    condition: ESTree.Expression
-  ): FlowNode {
+  appendConditionallyTo(node: FlowNode, label: string, condition: ESTree.Expression): FlowNode {
     return this.appendTo(node, label, condition, EdgeType.Conditional);
   }
 
@@ -78,14 +69,14 @@ export enum NodeType {
   Normal = 0,
   Entry = 1,
   SuccessExit = 2,
-  ErrorExit = 3
+  ErrorExit = 3,
 }
 
 export enum EdgeType {
   Normal = 0,
   Epsilon = 1,
   Conditional = 2,
-  AbruptCompletion = 3
+  AbruptCompletion = 3,
 }
 
 export interface ParsingContext {
@@ -116,7 +107,7 @@ export interface Completion {
 
 export const enum EnclosingStatementType {
   TryStatement,
-  OtherStatement
+  OtherStatement,
 }
 
 export interface EnclosingStatement {

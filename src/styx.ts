@@ -36,16 +36,14 @@ function normalizeParserOptions(options: ParserOptions): ParserOptions {
   } else {
     let passes = options.passes;
 
-    removeTransitNodes =
-      passes === true || (passes && passes.removeTransitNodes);
-    rewriteConstantConditionalEdges =
-      passes === true || (passes && passes.rewriteConstantConditionalEdges);
+    removeTransitNodes = passes === true || (passes && passes.removeTransitNodes);
+    rewriteConstantConditionalEdges = passes === true || (passes && passes.rewriteConstantConditionalEdges);
   }
 
   return {
     passes: {
       removeTransitNodes,
-      rewriteConstantConditionalEdges
-    }
+      rewriteConstantConditionalEdges,
+    },
   };
 }

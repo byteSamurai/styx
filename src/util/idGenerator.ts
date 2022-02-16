@@ -7,9 +7,9 @@ let idGeneratorFactory = {
     let id = 0;
 
     return {
-      generateId: () => ++id
+      generateId: () => ++id,
     };
-  }
+  },
 };
 
 export default idGeneratorFactory;

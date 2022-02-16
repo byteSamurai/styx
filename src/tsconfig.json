@@ -7,7 +7,8 @@
     "target": "ES2015",
     "module": "commonjs",
     "esModuleInterop": true,
-    "declaration": true
+    "declaration": true,
+    "sourceMap": true
   },
   "files": ["browser.ts"]
 }

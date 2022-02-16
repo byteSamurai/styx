@@ -8,7 +8,7 @@ type LookupObject = {
 };
 
 export let NumericSet = {
-  create: createSet
+  create: createSet,
 };
 
 function createSet(): NumericSet {
@@ -21,6 +21,6 @@ function createSet(): NumericSet {
 
     contains(value: number) {
       return value in lookup;
-    }
+    },
   };
 }

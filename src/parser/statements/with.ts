@@ -7,15 +7,9 @@ import { Completion, FlowNode, ParsingContext } from "../../flow";
 
 export { parseWithStatement };
 
-function parseWithStatement(
-  withStatement: ESTree.WithStatement,
-  currentNode: FlowNode,
-  context: ParsingContext
-): Completion {
+function parseWithStatement(withStatement: ESTree.WithStatement, currentNode: FlowNode, context: ParsingContext): Completion {
   let stringifiedExpression = stringify(withStatement.object);
-  let expressionNode = context
-    .createNode()
-    .appendTo(currentNode, stringifiedExpression, withStatement);
+  let expressionNode = context.createNode().appendTo(currentNode, stringifiedExpression, withStatement);
 
   return parseStatement(withStatement.body, expressionNode, context);
 }

@@ -9,19 +9,18 @@ import { createAssignmentExpression, createCallExpression, createIdentifier } fr
 
 import { Completion, EnclosingStatementType, FlowNode, ParsingContext } from "../../flow";
 
-export { parseForInStatement };
+export { parseForOfStatement };
 
-function parseForInStatement(forInStatement: ESTree.ForInStatement, currentNode: FlowNode, context: ParsingContext, label?: string): Completion {
+function parseForOfStatement(forOfStatement: ESTree.ForOfStatement, currentNode: FlowNode, context: ParsingContext, label?: string): Completion {
   let iteratorFunctionIdentifier = createIdentifier("$$iterator");
-  let iteratorCall = createCallExpression(iteratorFunctionIdentifier, [forInStatement.right]);
+  let iteratorCall = createCallExpression(iteratorFunctionIdentifier, [forOfStatement.right]);
 
   const iteratorName = context.createTemporaryLocalVariableName("iter");
   let iteratorIdentifier = createIdentifier(iteratorName);
   let iteratorAssignment = createAssignmentExpression({
     left: iteratorIdentifier,
     right: iteratorCall,
-  }
-  );
+  });
 
   let conditionNode = context.createNode().appendTo(currentNode, stringify(iteratorAssignment), iteratorAssignment);
 
@@ -46,7 +45,7 @@ function parseForInStatement(forInStatement: ESTree.ForInStatement, currentNode:
   };
 
   let propertyAssignment = createAssignmentExpression({
-    left: getLeftHandSideOfAssignment(forInStatement),
+    left: getLeftHandSideOfAssignment(forOfStatement),
     right: createCallExpression(nextElementCallee),
   });
 
@@ -59,7 +58,7 @@ function parseForInStatement(forInStatement: ESTree.ForInStatement, currentNode:
     label: label,
   });
 
-  let loopBodyCompletion = parseStatement(forInStatement.body, propertyAssignmentNode, context);
+  let loopBodyCompletion = parseStatement(forOfStatement.body, propertyAssignmentNode, context);
 
   context.enclosingStatements.pop();
 
@@ -70,14 +69,14 @@ function parseForInStatement(forInStatement: ESTree.ForInStatement, currentNode:
   return { normal: finalNode };
 }
 
-function getLeftHandSideOfAssignment(forInStatement: ESTree.ForInStatement): ESTree.Expression {
-  if (forInStatement.left.type === ESTree.NodeType.VariableDeclaration) {
-    let variableDeclarator = (<ESTree.VariableDeclaration>forInStatement.left).declarations[0];
+function getLeftHandSideOfAssignment(forOfStatement: ESTree.ForOfStatement): ESTree.Expression {
+  if (forOfStatement.left.type === ESTree.NodeType.VariableDeclaration) {
+    let variableDeclarator = (<ESTree.VariableDeclaration>forOfStatement.left).declarations[0];
     const variableName = variableDeclarator.id.name;
     const range = variableDeclarator.range;
     const loc = variableDeclarator.loc;
     return createIdentifier(variableName, range, loc);
   }
 
-  return forInStatement.left;
+  return forOfStatement.left;
 }

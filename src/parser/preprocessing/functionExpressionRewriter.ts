@@ -31,62 +31,45 @@ function rewriteFunctionExpressions(program: ESTree.Program): ESTree.Program {
   // The original program is not modified; instead, a clone is created
   let clonedProgram: ESTree.Program = JSON.parse(stringifiedProgram);
 
-  prependFunctionDeclarationsToProgramBody(
-    functionExpressionsToRewrite,
-    clonedProgram
-  );
+  prependFunctionDeclarationsToProgramBody(functionExpressionsToRewrite, clonedProgram);
 
   return clonedProgram;
 
   function visitNode(key: string, value: any): any {
-    return value && value.type === ESTree.NodeType.FunctionExpression
-      ? rewriteFunctionExpression(value)
-      : value;
+    return value && value.type === ESTree.NodeType.FunctionExpression ? rewriteFunctionExpression(value) : value;
   }
 
-  function rewriteFunctionExpression(
-    functionExpression: ESTree.FunctionExpression
-  ): ESTree.Identifier {
+  function rewriteFunctionExpression(functionExpression: ESTree.FunctionExpression): ESTree.Identifier {
     let funcId = functionIdGenerator.generateId();
-    let nameSuffix = functionExpression.id
-      ? "_" + functionExpression.id.name
-      : "";
+    let nameSuffix = functionExpression.id ? "_" + functionExpression.id.name : "";
     let funcName = `$$func${funcId}${nameSuffix}`;
 
-    const stringifiedFunctionExpressionBody = JSON.stringify(
-      functionExpression.body,
-      visitNode
-    );
+    const stringifiedFunctionExpressionBody = JSON.stringify(functionExpression.body, visitNode);
     let rewrittenFunctionExpression = clone(functionExpression);
-    rewrittenFunctionExpression.body = JSON.parse(
-      stringifiedFunctionExpressionBody
-    );
+    rewrittenFunctionExpression.body = JSON.parse(stringifiedFunctionExpressionBody);
 
     functionExpressionsToRewrite.push({
       name: funcName,
-      functionExpression: rewrittenFunctionExpression
+      functionExpression: rewrittenFunctionExpression,
     });
 
     return {
       type: ESTree.NodeType.Identifier,
-      name: funcName
+      name: funcName,
     };
   }
 }
 
-function prependFunctionDeclarationsToProgramBody(
-  rewrittenFunctions: RewrittenFunction[],
-  program: ESTree.Program
-) {
+function prependFunctionDeclarationsToProgramBody(rewrittenFunctions: RewrittenFunction[], program: ESTree.Program) {
   for (let rewrittenFunc of rewrittenFunctions) {
     let functionDeclaration: ESTree.Function = {
       type: ESTree.NodeType.FunctionDeclaration,
       id: {
         type: ESTree.NodeType.Identifier,
-        name: rewrittenFunc.name
+        name: rewrittenFunc.name,
       },
       params: clone(rewrittenFunc.functionExpression.params),
-      body: clone(rewrittenFunc.functionExpression.body)
+      body: clone(rewrittenFunc.functionExpression.body),
     };
 
     program.body.unshift(functionDeclaration);

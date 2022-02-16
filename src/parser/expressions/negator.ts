@@ -1,9 +1,6 @@
 import * as ESTree from "../../estree";
 
-import {
-  createLiteral,
-  createUnaryNegationExpression
-} from "../../estreeFactory";
+import { createLiteral, createUnaryNegationExpression } from "../../estreeFactory";
 
 export { negateTruthiness };
 
@@ -35,9 +32,7 @@ function negateTruthiness(expression: ESTree.Expression): ESTree.Expression {
   return createUnaryNegationExpression(expression);
 }
 
-function invertEqualityComparisonOperator(
-  binaryExpression: ESTree.BinaryExpression
-): ESTree.BinaryExpression {
+function invertEqualityComparisonOperator(binaryExpression: ESTree.BinaryExpression): ESTree.BinaryExpression {
   let isNegated = binaryExpression.operator.charAt(0) === "!";
   let firstCharOfInvertedOperator = isNegated ? "=" : "!";
   let restOfInvertedOperator = binaryExpression.operator.substr(1);
@@ -46,13 +41,11 @@ function invertEqualityComparisonOperator(
     type: ESTree.NodeType.BinaryExpression,
     operator: firstCharOfInvertedOperator + restOfInvertedOperator,
     left: binaryExpression.left,
-    right: binaryExpression.right
+    right: binaryExpression.right,
   };
 }
 
-function invertLogicalExpression(
-  logicalExpression: ESTree.LogicalExpression
-): ESTree.LogicalExpression {
+function invertLogicalExpression(logicalExpression: ESTree.LogicalExpression): ESTree.LogicalExpression {
   // The only two logical operators are && and ||
   let invertedOperator = logicalExpression.operator === "&&" ? "||" : "&&";
 
@@ -62,6 +55,6 @@ function invertLogicalExpression(
 
     // Perform simplification according to De Morgan's laws
     left: negateTruthiness(logicalExpression.left),
-    right: negateTruthiness(logicalExpression.right)
+    right: negateTruthiness(logicalExpression.right),
   };
 }

@@ -4,30 +4,30 @@ import { ControlFlowGraph, EdgeType, FlowProgram, NodeType } from "../flow";
 
 function exportAsObject(flowProgram: FlowProgram) {
   let program = {
-    flowGraph: flattenFlowGraph(flowProgram.flowGraph)
+    flowGraph: flattenFlowGraph(flowProgram.flowGraph),
   };
 
-  let functions = flowProgram.functions.map(fun => ({
+  let functions = flowProgram.functions.map((fun) => ({
     id: fun.id,
     name: fun.name,
-    flowGraph: flattenFlowGraph(fun.flowGraph)
+    flowGraph: flattenFlowGraph(fun.flowGraph),
   }));
 
   return { program, functions };
 }
 
 function flattenFlowGraph(flowGraph: ControlFlowGraph) {
-  let nodes = flowGraph.nodes.map(node => ({
+  let nodes = flowGraph.nodes.map((node) => ({
     id: node.id,
-    type: NodeType[node.type]
+    type: NodeType[node.type],
   }));
 
-  let edges = flowGraph.edges.map(edge => ({
+  let edges = flowGraph.edges.map((edge) => ({
     from: edge.source.id,
     to: edge.target.id,
     type: EdgeType[edge.type],
     label: edge.label,
-    data: edge.data
+    data: edge.data,
   }));
 
   return { nodes, edges };

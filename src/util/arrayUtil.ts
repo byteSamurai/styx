@@ -6,10 +6,7 @@ export function removeElementFromArray<T>(element: T, array: T[]) {
   }
 }
 
-export function partition<T>(
-  elements: T[],
-  predicate: (value: T) => boolean
-): [T[], T[]] {
+export function partition<T>(elements: T[], predicate: (value: T) => boolean): [T[], T[]] {
   let matches: T[] = [];
   let mismatches: T[] = [];
 

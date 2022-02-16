@@ -18,12 +18,7 @@ function removeUnreachableNodes(graph: ControlFlowGraph) {
   let visitedNodes = NumericSet.create();
 
   for (let { value: reachableNode } of reachableNodes.entries()) {
-    collectUnreachableNodes(
-      reachableNode,
-      reachableNodes,
-      unreachableNodes,
-      visitedNodes
-    );
+    collectUnreachableNodes(reachableNode, reachableNodes, unreachableNodes, visitedNodes);
   }
 
   // Finally, delete unreachable (normal) nodes and their edges
@@ -34,10 +29,7 @@ function removeUnreachableNodes(graph: ControlFlowGraph) {
   }
 }
 
-function collectReachableNodes(
-  currentNode: FlowNode,
-  reachableNodes: NumericMap<FlowNode>
-) {
+function collectReachableNodes(currentNode: FlowNode, reachableNodes: NumericMap<FlowNode>) {
   if (reachableNodes.containsKey(currentNode.id)) {
     return;
   }
@@ -49,12 +41,7 @@ function collectReachableNodes(
   }
 }
 
-function collectUnreachableNodes(
-  node: FlowNode,
-  reachableNodes: NumericMap<FlowNode>,
-  unreachableNodes: NumericMap<FlowNode>,
-  visitedNodes: NumericSet
-) {
+function collectUnreachableNodes(node: FlowNode, reachableNodes: NumericMap<FlowNode>, unreachableNodes: NumericMap<FlowNode>, visitedNodes: NumericSet) {
   if (visitedNodes.contains(node.id)) {
     return;
   }
@@ -66,37 +53,21 @@ function collectUnreachableNodes(
   }
 
   for (let incomingEdge of node.incomingEdges) {
-    collectUnreachableNodes(
-      incomingEdge.source,
-      reachableNodes,
-      unreachableNodes,
-      visitedNodes
-    );
+    collectUnreachableNodes(incomingEdge.source, reachableNodes, unreachableNodes, visitedNodes);
   }
 
   for (let outgoingEdge of node.outgoingEdges) {
-    collectUnreachableNodes(
-      outgoingEdge.target,
-      reachableNodes,
-      unreachableNodes,
-      visitedNodes
-    );
+    collectUnreachableNodes(outgoingEdge.target, reachableNodes, unreachableNodes, visitedNodes);
   }
 }
 
 function removeUnreachableNode(node: FlowNode) {
   for (let incomingEdge of node.incomingEdges) {
-    ArrayUtils.removeElementFromArray(
-      incomingEdge,
-      incomingEdge.source.outgoingEdges
-    );
+    ArrayUtils.removeElementFromArray(incomingEdge, incomingEdge.source.outgoingEdges);
   }
 
   for (let outgoingEdge of node.outgoingEdges) {
-    ArrayUtils.removeElementFromArray(
-      outgoingEdge,
-      outgoingEdge.target.incomingEdges
-    );
+    ArrayUtils.removeElementFromArray(outgoingEdge, outgoingEdge.target.incomingEdges);
   }
 
   node.incomingEdges = [];

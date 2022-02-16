@@ -7,23 +7,12 @@ import { parseExpression } from "./expression";
 import { parseStatement } from "./statement";
 
 import * as ESTree from "../../estree";
-import {
-  Completion,
-  EnclosingStatementType,
-  FlowNode,
-  ParsingContext
-} from "../../flow";
+import { Completion, EnclosingStatementType, FlowNode, ParsingContext } from "../../flow";
 
 export { parseForStatement };
 
-function parseForStatement(
-  forStatement: ESTree.ForStatement,
-  currentNode: FlowNode,
-  context: ParsingContext,
-  label?: string
-): Completion {
-  let testDecisionNode = parseInit(forStatement.init, currentNode, context)
-    .normal;
+function parseForStatement(forStatement: ESTree.ForStatement, currentNode: FlowNode, context: ParsingContext, label?: string): Completion {
+  let testDecisionNode = parseInit(forStatement.init, currentNode, context).normal;
 
   // Create nodes for loop cornerstones
   let beginOfLoopBodyNode = context.createNode();
@@ -41,16 +30,8 @@ function parseForStatement(
     let falsyConditionLabel = stringify(falsyCondition);
 
     // Add truthy and falsy edges
-    beginOfLoopBodyNode.appendConditionallyTo(
-      testDecisionNode,
-      truthyConditionLabel,
-      truthyCondition
-    );
-    finalNode.appendConditionallyTo(
-      testDecisionNode,
-      falsyConditionLabel,
-      falsyCondition
-    );
+    beginOfLoopBodyNode.appendConditionallyTo(testDecisionNode, truthyConditionLabel, truthyCondition);
+    finalNode.appendConditionallyTo(testDecisionNode, falsyConditionLabel, falsyCondition);
   } else {
     // If the loop doesn't have a test expression,
     // the loop body starts unconditionally after the initialization
@@ -61,25 +42,17 @@ function parseForStatement(
     type: EnclosingStatementType.OtherStatement,
     continueTarget: updateNode,
     breakTarget: finalNode,
-    label: label
+    label: label,
   });
 
-  let loopBodyCompletion = parseStatement(
-    forStatement.body,
-    beginOfLoopBodyNode,
-    context
-  );
+  let loopBodyCompletion = parseStatement(forStatement.body, beginOfLoopBodyNode, context);
 
   context.enclosingStatements.pop();
 
   if (forStatement.update) {
     // If the loop has an update expression,
     // parse it and append it to the end of the loop body
-    let endOfUpdateNode = parseExpression(
-      forStatement.update,
-      updateNode,
-      context
-    );
+    let endOfUpdateNode = parseExpression(forStatement.update, updateNode, context);
     testDecisionNode.appendEpsilonEdgeTo(endOfUpdateNode);
   } else {
     // If the loop doesn't have an update expression,
@@ -96,24 +69,16 @@ function parseForStatement(
   return { normal: finalNode };
 }
 
-function parseInit(
-  init: ESTree.VariableDeclaration | ESTree.Expression,
-  currentNode: FlowNode,
-  context: ParsingContext
-): Completion {
+function parseInit(init: ESTree.VariableDeclaration | ESTree.Expression, currentNode: FlowNode, context: ParsingContext): Completion {
   if (init === null) {
     return { normal: currentNode };
   }
 
   if (init.type === ESTree.NodeType.VariableDeclaration) {
-    return parseVariableDeclaration(
-      <ESTree.VariableDeclaration>init,
-      currentNode,
-      context
-    );
+    return parseVariableDeclaration(<ESTree.VariableDeclaration>init, currentNode, context);
   }
 
   return {
-    normal: parseExpression(<ESTree.Expression>init, currentNode, context)
+    normal: parseExpression(<ESTree.Expression>init, currentNode, context),
   };
 }

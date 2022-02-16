@@ -5,11 +5,11 @@ module.exports = {
 
   output: {
     path: path.resolve(__dirname, "dist/browser"),
-    filename: "styx.js"
+    filename: "styx.js",
   },
 
   resolve: {
-    extensions: [".js", ".ts"]
+    extensions: [".js", ".ts"],
   },
 
   module: {
@@ -17,8 +17,8 @@ module.exports = {
       {
         test: /\.ts$/,
         include: path.resolve(__dirname, "src"),
-        use: "ts-loader"
-      }
-    ]
-  }
+        use: "ts-loader",
+      },
+    ],
+  },
 };

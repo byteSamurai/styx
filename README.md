@@ -3,16 +3,14 @@
 Derives the control flow graph from a JavaScript AST in [ESTree](https://github.com/estree/estree) format.
 
 > This project was created as a proof-of-concept implemention for my Bachelor's thesis in computer science:
-> 
+>
 > - [Deriving Control Flow Graphs from JavaScript Programs](https://github.com/mariusschulz/bachelors-thesis/blob/master/thesis.pdf)
-
 
 ## Install
 
 ```
 $ npm install styx
 ```
-
 
 ## Usage
 

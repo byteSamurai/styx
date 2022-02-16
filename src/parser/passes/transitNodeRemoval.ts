@@ -18,22 +18,15 @@ function optimizeNode(node: FlowNode, visitedNodes: NumericSet) {
   visitedNodes.add(node.id);
 
   // Remember target nodes for later traversal
-  let targetNodes = node.outgoingEdges.map(edge => edge.target);
+  let targetNodes = node.outgoingEdges.map((edge) => edge.target);
 
   // We want to simplify transit nodes, but we only ever remove normal nodes
   // because we don't want to mess up references to entry or exit nodes
-  if (
-    node.incomingEdges.length === 1 &&
-    node.outgoingEdges.length === 1 &&
-    node.type === NodeType.Normal
-  ) {
+  if (node.incomingEdges.length === 1 && node.outgoingEdges.length === 1 && node.type === NodeType.Normal) {
     let incomingEdge = node.incomingEdges[0];
     let outgoingEdge = node.outgoingEdges[0];
 
-    if (
-      incomingEdge.type === EdgeType.Epsilon ||
-      outgoingEdge.type === EdgeType.Epsilon
-    ) {
+    if (incomingEdge.type === EdgeType.Epsilon || outgoingEdge.type === EdgeType.Epsilon) {
       optimizeTransitNode(node, visitedNodes);
     }
   }
@@ -79,10 +72,7 @@ function removeTransitNode(transitNode: FlowNode) {
 
   // Decide whether to keep the incoming or the outgoing edge.
   // If both are epsilon edges, it doesn't matter which one to keep.
-  let [edgeToKeep, edgeToRemove] =
-    incomingEdge.type === EdgeType.Epsilon
-      ? [outgoingEdge, incomingEdge]
-      : [incomingEdge, outgoingEdge];
+  let [edgeToKeep, edgeToRemove] = incomingEdge.type === EdgeType.Epsilon ? [outgoingEdge, incomingEdge] : [incomingEdge, outgoingEdge];
 
   // Redirect surviving edge
   edgeToKeep.source = source;

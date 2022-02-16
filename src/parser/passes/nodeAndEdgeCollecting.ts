@@ -16,10 +16,7 @@ function collectNodes(graphEntry: FlowNode): FlowNode[] {
   return nodes.values();
 }
 
-function walkGraphAndCollectNodes(
-  currentNode: FlowNode,
-  nodes: NumericMap<FlowNode>
-) {
+function walkGraphAndCollectNodes(currentNode: FlowNode, nodes: NumericMap<FlowNode>) {
   if (nodes.containsKey(currentNode.id)) {
     return;
   }

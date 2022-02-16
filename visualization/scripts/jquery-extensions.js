@@ -1,8 +1,8 @@
 /* global $ */
 
-(function() {
-  $.fn.setCaretPosition = function(position) {
-    return this.each(function() {
+(function () {
+  $.fn.setCaretPosition = function (position) {
+    return this.each(function () {
       if (this.setSelectionRange) {
         this.focus();
         this.setSelectionRange(position, position);

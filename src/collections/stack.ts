@@ -12,7 +12,7 @@ export interface Stack<T> {
 }
 
 export let Stack = {
-  create: createStack
+  create: createStack,
 };
 
 function createStack<T>(): Stack<T> {
@@ -49,6 +49,6 @@ function createStack<T>(): Stack<T> {
       }
 
       return void 0;
-    }
+    },
   };
 }
