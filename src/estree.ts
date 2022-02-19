@@ -42,7 +42,7 @@ export class NodeType {
 
 export interface Node {
   type: string;
-  loc?: {start:{line:Number, column: Number}, end:{line:Number, column: Number}},
+  loc?: {start:{line:Number, column: Number}, end:{line:Number, column: Number}} | null,
   range?: Number[]
 }
 
@@ -256,6 +256,6 @@ export interface Identifier extends Node, Expression {
 }
 
 export interface Literal extends Node, Expression {
-  value: string | boolean | number | RegExp;
+  value: null| string | boolean | number | RegExp;
   raw: string; // Not part of the ESTree specification, but provided by Esprima
 }
